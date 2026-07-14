@@ -110,9 +110,9 @@
   }
   .secondary-btn {
     display: block;
-    margin-top: 12px;
+    margin: 10px auto;
     color: #666;
-    font-size: 13px;
+    font-size: 14px;
     text-decoration: underline;
     background: none;
     border: none;
@@ -121,7 +121,6 @@
   .copy-btn {
     background: #f0f0f0;
     color: #333;
-    margin-top: 10px;
   }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp {
@@ -176,8 +175,7 @@
   const browser = detectBrowser();
   const currentUrl = window.location.href;
   
-  document.getElementById("detectedBrowser").textContent =
-    `Detected: ${browser.name}`;
+  document.getElementById("detectedBrowser").textContent = `Detected: ${browser.name}`;
 
   const openChromeBtn = document.getElementById("openChromeBtn");
   const copyLinkBtn = document.getElementById("copyLinkBtn");
@@ -188,38 +186,37 @@
   const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
   if (isAndroid) {
-    // Android: Try to open Chrome app, fallback to Play Store
+    // Android: Use proper intent URL with fallback
     openChromeBtn.textContent = "Open in Chrome App";
     openChromeBtn.onclick = () => {
-      // Try Chrome custom scheme
-      window.location.href = `googlechrome://${currentUrl.replace(/^https?:\/\//, '')}`;
-      setTimeout(() => {
-        // If Chrome app not installed, redirect to Play Store
-        window.location.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
-      }, 2000);
+      const urlWithoutProtocol = currentUrl.replace(/^https?:\/\//, '');
+      // Proper Android intent URL
+      const intentUrl = `intent://navigate/${encodeURIComponent(currentUrl)}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.android.chrome')};end`;
+      window.location.href = intentUrl;
     };
-    downloadBtn.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
+    downloadBtn.onclick = () => {
+      window.location.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
+    };
   } else if (isIOS) {
     // iOS: Use Chrome custom scheme
     openChromeBtn.textContent = "Open in Chrome App";
     openChromeBtn.onclick = () => {
-      window.location.href = `googlechrome://${currentUrl.replace(/^https?:\/\//, '')}`;
-      setTimeout(() => {
-        // If Chrome app not installed, redirect to App Store
-        window.location.href = "https://apps.apple.com/app/google-chrome/id535886823";
-      }, 2000);
+      const urlWithoutProtocol = currentUrl.replace(/^https?:\/\//, '');
+      window.location.href = `googlechrome://${urlWithoutProtocol}`;
     };
-    downloadBtn.href = "https://apps.apple.com/app/google-chrome/id535886823";
+    downloadBtn.onclick = () => {
+      window.location.href = "https://apps.apple.com/app/google-chrome/id535886823";
+    };
   } else {
     // Desktop: Just show copy link option
     openChromeBtn.style.display = "none";
-    copyLinkBtn.textContent = "Copy Link & Open Chrome";
+    copyLinkBtn.textContent = "Copy Link & Open Chrome Manually";
     copyLinkBtn.onclick = () => {
       navigator.clipboard?.writeText(currentUrl).then(() => {
-        copyLinkBtn.textContent = "✓ Link copied!";
+        copyLinkBtn.textContent = "✓ Link copied! Now paste in Chrome";
         setTimeout(() => {
-          copyLinkBtn.textContent = "Copy Link & Open Chrome";
-        }, 2500);
+          copyLinkBtn.textContent = "Copy Link & Open Chrome Manually";
+        }, 3000);
       }).catch(() => {
         // Fallback for older browsers
         const textarea = document.createElement("textarea");
@@ -228,13 +225,15 @@
         textarea.select();
         document.execCommand("copy");
         document.body.removeChild(textarea);
-        copyLinkBtn.textContent = "✓ Link copied!";
+        copyLinkBtn.textContent = "✓ Link copied! Now paste in Chrome";
         setTimeout(() => {
-          copyLinkBtn.textContent = "Copy Link & Open Chrome";
-        }, 2500);
+          copyLinkBtn.textContent = "Copy Link & Open Chrome Manually";
+        }, 3000);
       });
     };
-    downloadBtn.href = "https://www.google.com/chrome/";
+    downloadBtn.onclick = () => {
+      window.open("https://www.google.com/chrome/", "_blank");
+    };
   }
 
   if (!browser.isChrome) {
