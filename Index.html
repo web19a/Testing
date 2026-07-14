@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Open in Chrome</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    overflow: hidden;
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 36px 28px 28px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .modal-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+  }
+
+  .modal-icon svg {
+    width: 44px;
+    height: 44px;
+    fill: #fff;
+  }
+
+  .modal h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .modal p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: #94a3b8;
+    margin-bottom: 24px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px 24px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+
+  .btn svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+  }
+
+  .hint {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  .hint code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #cbd5e1;
+  }
+
+  /* Normal page content (shown when opened in Chrome) */
+  .page-content {
+    display: none;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .page-content.active { display: block; }
+  .page-content h1 { font-size: 28px; margin-bottom: 12px; color: #fff; }
+  .page-content p { color: #94a3b8; font-size: 16px; }
+</style>
+</head>
+<body>
+
+  <!-- Modal shown when opened inside Telegram WebView -->
+  <div class="modal-overlay" id="modal" style="display:none;">
+    <div class="modal">
+      <div class="modal-icon">
+        <!-- Chrome-like icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3.14.69 4.22 1.76L13.08 11H7.02c.44-2.78 2.58-5 4.98-5zm-6 7c0-.73.14-1.43.38-2.08l4.1 7.1C7.32 15.92 6 14.11 6 12zm6 7c-1.1 0-2.14-.27-3.05-.74l3.17-5.5 4.24 2.45C15.55 17.1 13.88 19 12 19zm6.32-4.87l-4.24-2.45 3.14-5.43c1.2 1.2 1.93 2.85 1.93 4.75 0 1.17-.32 2.27-.83 3.13z"/>
+        </svg>
+      </div>
+      <h2>Open in Chrome</h2>
+      <p>This page works best in a full browser. Please open it in Chrome for the complete experience.</p>
+
+      <a href="#" class="btn" id="openChromeBtn">
+        <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+        <span id="btnText">Open in Chrome</span>
+      </a>
+
+      <p class="hint" id="hintText"></p>
+    </div>
+  </div>
+
+  <!-- Your actual page content (visible only in Chrome) -->
+  <div class="page-content" id="pageContent">
+    <h1>🎉 Welcome!</h1>
+    <p>You're now viewing this page in Chrome.</p>
+    <p style="margin-top: 12px; font-size: 14px;">Replace this section with your real content.</p>
+  </div>
+
+<script>
+(function() {
+  // ---------- 1. Detect Telegram WebView ----------
+  function isTelegramWebView() {
+    // Primary check: Telegram injects this object
+    if (window.Telegram && window.Telegram.WebApp) return true;
+
+    const ua = navigator.userAgent || '';
+    // Telegram iOS / Android / Desktop user agents all contain "Telegram"
+    if (/Telegram/i.test(ua)) return true;
+
+    // Some Telegram Web App variants expose initData
+    if (window.TelegramWebviewProxy) return true;
+
+    return false;
+  }
+
+  // ---------- 2. Detect platform ----------
+  function getPlatform() {
+    const ua = navigator.userAgent || '';
+    if (/android/i.test(ua)) return 'android';
+    if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    return 'desktop';
+  }
+
+  // ---------- 3. Build Chrome deep-link for current URL ----------
+  function buildChromeUrl() {
+    const currentUrl = window.location.href;
+    const platform = getPlatform();
+
+    if (platform === 'android') {
+      // Android intent: forces opening in Chrome package
+      const encoded = encodeURIComponent(currentUrl);
+      return `intent://view?url=${encoded}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
+    }
+    if (platform === 'ios') {
+      // iOS Chrome scheme: replace https:// with googlechrome://
+      return currentUrl.replace(/^https?:\/\//, 'googlechrome://');
+    }
+    // Desktop fallback — just return the URL (user can copy)
+    return currentUrl;
+  }
+
+  // ---------- 4. Main logic ----------
+  if (!isTelegramWebView()) {
+    // Not in Telegram → show normal content
+    document.getElementById('pageContent').classList.add('active');
+    document.getElementById('modal').style.display = 'none';
+    return;
+  }
+
+  // In Telegram → show modal
+  const modal = document.getElementById('modal');
+  const btn = document.getElementById('openChromeBtn');
+  const btnText = document.getElementById('btnText');
+  const hint = document.getElementById('hintText');
+  const platform = getPlatform();
+
+  modal.style.display = 'flex';
+
+  // Platform-specific hint text
+  if (platform === 'android') {
+    hint.innerHTML = 'If Chrome is not installed, tap the <code>⋮</code> menu → <b>Open in browser</b>.';
+  } else if (platform === 'ios') {
+    hint.innerHTML = 'Make sure <b>Google Chrome</b> is installed. If not, tap the <code>•••</code> menu → <b>Open in Safari</b>.';
+  } else {
+    hint.innerHTML = 'Please copy this link and paste it in Chrome.';
+  }
+
+  // CTA click handler
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const url = buildChromeUrl();
+
+    if (platform === 'desktop') {
+      // Desktop: copy to clipboard
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        btnText.textContent = '✓ Link Copied!';
+        setTimeout(() => { btnText.textContent = 'Open in Chrome'; }, 2500);
+      }).catch(() => {
+        // Fallback: select text
+        const ta = document.createElement('textarea');
+        ta.value = window.location.href;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btnText.textContent = '✓ Link Copied!';
+      });
+    } else {
+      // Mobile: attempt deep link
+      btnText.textContent = 'Opening...';
+      window.location.href = url;
+
+      // If deep link fails (Chrome not installed), restore button after delay
+      setTimeout(() => {
+        btnText.textContent = 'Open in Chrome';
+        if (platform === 'ios') {
+          // Try Safari fallback on iOS
+          if (!confirm('Chrome may not be installed. Open in Safari instead?')) return;
+          window.location.href = window.location.href;
+        }
+      }, 1500);
+    }
+  });
+
+  // Optional: auto-trigger on load (uncomment to skip modal and launch immediately)
+  // setTimeout(() => btn.click(), 300);
+})();
+</script>
+</body>
+</html>
