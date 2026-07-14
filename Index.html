@@ -102,6 +102,7 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     width: 100%;
+    margin-bottom: 10px;
   }
   .cta-btn:hover {
     transform: translateY(-2px);
@@ -116,6 +117,11 @@
     background: none;
     border: none;
     cursor: pointer;
+  }
+  .copy-btn {
+    background: #f0f0f0;
+    color: #333;
+    margin-top: 10px;
   }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp {
@@ -137,7 +143,8 @@
     <h1>Chrome Required</h1>
     <p>This experience is optimized for <strong>Google Chrome</strong>. Please open this page in Chrome to continue.</p>
     <div class="detected" id="detectedBrowser"></div>
-    <a href="#" class="cta-btn" id="ctaBtn">Open in Chrome</a>
+    <button class="cta-btn" id="openChromeBtn">Open in Chrome</button>
+    <button class="cta-btn copy-btn" id="copyLinkBtn">Copy Link</button>
     <button class="secondary-btn" id="downloadBtn">Download Chrome</button>
   </div>
 </div>
@@ -148,7 +155,6 @@
     const ua = navigator.userAgent;
     const vendor = navigator.vendor || "";
 
-    // Order matters: check Chromium-based impostors BEFORE Chrome
     if (/Edg\//.test(ua))      return { name: "Microsoft Edge", isChrome: false };
     if (/OPR\//.test(ua) || /Opera/.test(ua)) return { name: "Opera", isChrome: false };
     if (/Brave/.test(ua))      return { name: "Brave", isChrome: false };
@@ -160,55 +166,78 @@
     if (/Safari/.test(ua) && /Apple/.test(vendor) && !/Chrome/.test(ua))
       return { name: "Safari", isChrome: false };
 
-    // Actual Chrome
     if (/Chrome/.test(ua) && /Google Inc/.test(vendor))
       return { name: "Google Chrome", isChrome: true };
 
     return { name: "Unknown browser", isChrome: false };
   }
 
-  // ---- Build platform-specific CTA ----
-  function buildCTA() {
-    const ua = navigator.userAgent;
-    const isAndroid = /Android/i.test(ua);
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    const currentUrl = window.location.href;
+  // ---- Main logic ----
+  const browser = detectBrowser();
+  const currentUrl = window.location.href;
+  
+  document.getElementById("detectedBrowser").textContent =
+    `Detected: ${browser.name}`;
 
-    const ctaBtn = document.getElementById("ctaBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
+  const openChromeBtn = document.getElementById("openChromeBtn");
+  const copyLinkBtn = document.getElementById("copyLinkBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  
+  const ua = navigator.userAgent;
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
-    if (isAndroid) {
-      // Android Intent URL: launches Chrome directly if installed
-      const encoded = encodeURIComponent(currentUrl);
-      ctaBtn.href = `intent://navigate/${encoded}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
-      ctaBtn.textContent = "Open in Chrome";
-      downloadBtn.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
-    } else if (isIOS) {
-      // iOS: use Google Chrome's custom scheme, fallback to App Store
-      ctaBtn.href = `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`;
-      ctaBtn.textContent = "Open in Chrome App";
-      downloadBtn.href = "https://apps.apple.com/app/google-chrome/id535886823";
-    } else {
-      // Desktop: can't auto-launch, so offer download + instructions
-      ctaBtn.href = "#";
-      ctaBtn.textContent = "Copy Link & Open Chrome";
-      ctaBtn.onclick = (e) => {
-        e.preventDefault();
-        navigator.clipboard?.writeText(currentUrl);
-        ctaBtn.textContent = "✓ Link copied — paste it in Chrome";
-        setTimeout(() => { ctaBtn.textContent = "Copy Link & Open Chrome"; }, 2500);
-      };
-      downloadBtn.href = "https://www.google.com/chrome/";
-    }
+  if (isAndroid) {
+    // Android: Try to open Chrome app, fallback to Play Store
+    openChromeBtn.textContent = "Open in Chrome App";
+    openChromeBtn.onclick = () => {
+      // Try Chrome custom scheme
+      window.location.href = `googlechrome://${currentUrl.replace(/^https?:\/\//, '')}`;
+      setTimeout(() => {
+        // If Chrome app not installed, redirect to Play Store
+        window.location.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
+      }, 2000);
+    };
+    downloadBtn.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
+  } else if (isIOS) {
+    // iOS: Use Chrome custom scheme
+    openChromeBtn.textContent = "Open in Chrome App";
+    openChromeBtn.onclick = () => {
+      window.location.href = `googlechrome://${currentUrl.replace(/^https?:\/\//, '')}`;
+      setTimeout(() => {
+        // If Chrome app not installed, redirect to App Store
+        window.location.href = "https://apps.apple.com/app/google-chrome/id535886823";
+      }, 2000);
+    };
+    downloadBtn.href = "https://apps.apple.com/app/google-chrome/id535886823";
+  } else {
+    // Desktop: Just show copy link option
+    openChromeBtn.style.display = "none";
+    copyLinkBtn.textContent = "Copy Link & Open Chrome";
+    copyLinkBtn.onclick = () => {
+      navigator.clipboard?.writeText(currentUrl).then(() => {
+        copyLinkBtn.textContent = "✓ Link copied!";
+        setTimeout(() => {
+          copyLinkBtn.textContent = "Copy Link & Open Chrome";
+        }, 2500);
+      }).catch(() => {
+        // Fallback for older browsers
+        const textarea = document.createElement("textarea");
+        textarea.value = currentUrl;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        copyLinkBtn.textContent = "✓ Link copied!";
+        setTimeout(() => {
+          copyLinkBtn.textContent = "Copy Link & Open Chrome";
+        }, 2500);
+      });
+    };
+    downloadBtn.href = "https://www.google.com/chrome/";
   }
 
-  // ---- Main ----
-  const browser = detectBrowser();
-  document.getElementById("detectedBrowser").textContent =
-    `We detected you're using: ${browser.name}`;
-
   if (!browser.isChrome) {
-    buildCTA();
     document.getElementById("modal").style.display = "flex";
     document.body.style.overflow = "hidden";
   }
