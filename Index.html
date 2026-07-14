@@ -2,282 +2,217 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Open in Chrome</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chrome Required</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    height: 100%;
+  body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
-    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .main-content {
+    text-align: center;
+    max-width: 600px;
+    opacity: 0.3;
+    filter: blur(2px);
+    pointer-events: none;
   }
 
-  /* Modal overlay */
+  /* Modal */
   .modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
     z-index: 9999;
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.3s ease;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
   .modal {
-    background: linear-gradient(145deg, #1e293b, #0f172a);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 36px 28px 28px;
-    max-width: 420px;
+    background: #fff;
+    color: #1a1a2e;
+    border-radius: 16px;
+    padding: 40px 32px;
+    max-width: 440px;
     width: 100%;
     text-align: center;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-    animation: slideUp 0.4s ease-out;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-
-  .modal-icon {
-    width: 80px;
-    height: 80px;
+  .modal .logo {
+    width: 72px;
+    height: 72px;
     margin: 0 auto 20px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: conic-gradient(
+      from 0deg,
+      #ea4335 0deg 90deg,
+      #fbbc04 90deg 180deg,
+      #34a853 180deg 270deg,
+      #4285f4 270deg 360deg
+    );
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    position: relative;
   }
-
-  .modal-icon svg {
-    width: 44px;
-    height: 44px;
-    fill: #fff;
+  .modal .logo::after {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    background: #fff;
+    border-radius: 50%;
+    border: 8px solid #4285f4;
   }
-
-  .modal h2 {
-    font-size: 22px;
+  .modal h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
     font-weight: 700;
-    margin-bottom: 10px;
-    color: #fff;
   }
-
   .modal p {
     font-size: 15px;
-    line-height: 1.55;
-    color: #94a3b8;
+    color: #555;
+    line-height: 1.6;
     margin-bottom: 24px;
   }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 15px 24px;
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
-  }
-
-  .btn:active {
-    transform: scale(0.97);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-  }
-
-  .btn svg {
-    width: 20px;
-    height: 20px;
-    fill: #fff;
-  }
-
-  .hint {
-    margin-top: 16px;
+  .detected {
+    background: #fff3cd;
+    color: #856404;
+    padding: 10px 14px;
+    border-radius: 8px;
     font-size: 13px;
-    color: #64748b;
-    line-height: 1.5;
+    margin-bottom: 20px;
+    border: 1px solid #ffeaa7;
   }
-
-  .hint code {
-    background: rgba(255, 255, 255, 0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #cbd5e1;
+  .cta-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
   }
-
-  /* Normal page content (shown when opened in Chrome) */
-  .page-content {
-    display: none;
-    padding: 40px 24px;
-    text-align: center;
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(66, 133, 244, 0.4);
   }
-  .page-content.active { display: block; }
-  .page-content h1 { font-size: 28px; margin-bottom: 12px; color: #fff; }
-  .page-content p { color: #94a3b8; font-size: 16px; }
+  .secondary-btn {
+    display: block;
+    margin-top: 12px;
+    color: #666;
+    font-size: 13px;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
 
-  <!-- Modal shown when opened inside Telegram WebView -->
-  <div class="modal-overlay" id="modal" style="display:none;">
-    <div class="modal">
-      <div class="modal-icon">
-        <!-- Chrome-like icon -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3.14.69 4.22 1.76L13.08 11H7.02c.44-2.78 2.58-5 4.98-5zm-6 7c0-.73.14-1.43.38-2.08l4.1 7.1C7.32 15.92 6 14.11 6 12zm6 7c-1.1 0-2.14-.27-3.05-.74l3.17-5.5 4.24 2.45C15.55 17.1 13.88 19 12 19zm6.32-4.87l-4.24-2.45 3.14-5.43c1.2 1.2 1.93 2.85 1.93 4.75 0 1.17-.32 2.27-.83 3.13z"/>
-        </svg>
-      </div>
-      <h2>Open in Chrome</h2>
-      <p>This page works best in a full browser. Please open it in Chrome for the complete experience.</p>
+<div class="main-content">
+  <h1>🔒 Protected Content</h1>
+  <p>This page requires Google Chrome to be viewed properly.</p>
+</div>
 
-      <a href="#" class="btn" id="openChromeBtn">
-        <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
-        <span id="btnText">Open in Chrome</span>
-      </a>
-
-      <p class="hint" id="hintText"></p>
-    </div>
+<div class="modal-overlay" id="modal" style="display:none;">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="logo" aria-hidden="true"></div>
+    <h1>Chrome Required</h1>
+    <p>This experience is optimized for <strong>Google Chrome</strong>. Please open this page in Chrome to continue.</p>
+    <div class="detected" id="detectedBrowser"></div>
+    <a href="#" class="cta-btn" id="ctaBtn">Open in Chrome</a>
+    <button class="secondary-btn" id="downloadBtn">Download Chrome</button>
   </div>
-
-  <!-- Your actual page content (visible only in Chrome) -->
-  <div class="page-content" id="pageContent">
-    <h1>🎉 Welcome!</h1>
-    <p>You're now viewing this page in Chrome.</p>
-    <p style="margin-top: 12px; font-size: 14px;">Replace this section with your real content.</p>
-  </div>
+</div>
 
 <script>
-(function() {
-  // ---------- 1. Detect Telegram WebView ----------
-  function isTelegramWebView() {
-    // Primary check: Telegram injects this object
-    if (window.Telegram && window.Telegram.WebApp) return true;
+  // ---- Browser detection ----
+  function detectBrowser() {
+    const ua = navigator.userAgent;
+    const vendor = navigator.vendor || "";
 
-    const ua = navigator.userAgent || '';
-    // Telegram iOS / Android / Desktop user agents all contain "Telegram"
-    if (/Telegram/i.test(ua)) return true;
+    // Order matters: check Chromium-based impostors BEFORE Chrome
+    if (/Edg\//.test(ua))      return { name: "Microsoft Edge", isChrome: false };
+    if (/OPR\//.test(ua) || /Opera/.test(ua)) return { name: "Opera", isChrome: false };
+    if (/Brave/.test(ua))      return { name: "Brave", isChrome: false };
+    if (/Vivaldi/.test(ua))    return { name: "Vivaldi", isChrome: false };
+    if (/YaBrowser/.test(ua))  return { name: "Yandex Browser", isChrome: false };
+    if (/SamsungBrowser/.test(ua)) return { name: "Samsung Internet", isChrome: false };
+    if (/UCBrowser/.test(ua))  return { name: "UC Browser", isChrome: false };
+    if (/Firefox/.test(ua))    return { name: "Firefox", isChrome: false };
+    if (/Safari/.test(ua) && /Apple/.test(vendor) && !/Chrome/.test(ua))
+      return { name: "Safari", isChrome: false };
 
-    // Some Telegram Web App variants expose initData
-    if (window.TelegramWebviewProxy) return true;
+    // Actual Chrome
+    if (/Chrome/.test(ua) && /Google Inc/.test(vendor))
+      return { name: "Google Chrome", isChrome: true };
 
-    return false;
+    return { name: "Unknown browser", isChrome: false };
   }
 
-  // ---------- 2. Detect platform ----------
-  function getPlatform() {
-    const ua = navigator.userAgent || '';
-    if (/android/i.test(ua)) return 'android';
-    if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
-    return 'desktop';
-  }
-
-  // ---------- 3. Build Chrome deep-link for current URL ----------
-  function buildChromeUrl() {
+  // ---- Build platform-specific CTA ----
+  function buildCTA() {
+    const ua = navigator.userAgent;
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
     const currentUrl = window.location.href;
-    const platform = getPlatform();
 
-    if (platform === 'android') {
-      // Android intent: forces opening in Chrome package
+    const ctaBtn = document.getElementById("ctaBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    if (isAndroid) {
+      // Android Intent URL: launches Chrome directly if installed
       const encoded = encodeURIComponent(currentUrl);
-      return `intent://view?url=${encoded}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
-    }
-    if (platform === 'ios') {
-      // iOS Chrome scheme: replace https:// with googlechrome://
-      return currentUrl.replace(/^https?:\/\//, 'googlechrome://');
-    }
-    // Desktop fallback — just return the URL (user can copy)
-    return currentUrl;
-  }
-
-  // ---------- 4. Main logic ----------
-  if (!isTelegramWebView()) {
-    // Not in Telegram → show normal content
-    document.getElementById('pageContent').classList.add('active');
-    document.getElementById('modal').style.display = 'none';
-    return;
-  }
-
-  // In Telegram → show modal
-  const modal = document.getElementById('modal');
-  const btn = document.getElementById('openChromeBtn');
-  const btnText = document.getElementById('btnText');
-  const hint = document.getElementById('hintText');
-  const platform = getPlatform();
-
-  modal.style.display = 'flex';
-
-  // Platform-specific hint text
-  if (platform === 'android') {
-    hint.innerHTML = 'If Chrome is not installed, tap the <code>⋮</code> menu → <b>Open in browser</b>.';
-  } else if (platform === 'ios') {
-    hint.innerHTML = 'Make sure <b>Google Chrome</b> is installed. If not, tap the <code>•••</code> menu → <b>Open in Safari</b>.';
-  } else {
-    hint.innerHTML = 'Please copy this link and paste it in Chrome.';
-  }
-
-  // CTA click handler
-  btn.addEventListener('click', function(e) {
-    e.preventDefault();
-    const url = buildChromeUrl();
-
-    if (platform === 'desktop') {
-      // Desktop: copy to clipboard
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        btnText.textContent = '✓ Link Copied!';
-        setTimeout(() => { btnText.textContent = 'Open in Chrome'; }, 2500);
-      }).catch(() => {
-        // Fallback: select text
-        const ta = document.createElement('textarea');
-        ta.value = window.location.href;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        btnText.textContent = '✓ Link Copied!';
-      });
+      ctaBtn.href = `intent://navigate/${encoded}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
+      ctaBtn.textContent = "Open in Chrome";
+      downloadBtn.href = "https://play.google.com/store/apps/details?id=com.android.chrome";
+    } else if (isIOS) {
+      // iOS: use Google Chrome's custom scheme, fallback to App Store
+      ctaBtn.href = `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`;
+      ctaBtn.textContent = "Open in Chrome App";
+      downloadBtn.href = "https://apps.apple.com/app/google-chrome/id535886823";
     } else {
-      // Mobile: attempt deep link
-      btnText.textContent = 'Opening...';
-      window.location.href = url;
-
-      // If deep link fails (Chrome not installed), restore button after delay
-      setTimeout(() => {
-        btnText.textContent = 'Open in Chrome';
-        if (platform === 'ios') {
-          // Try Safari fallback on iOS
-          if (!confirm('Chrome may not be installed. Open in Safari instead?')) return;
-          window.location.href = window.location.href;
-        }
-      }, 1500);
+      // Desktop: can't auto-launch, so offer download + instructions
+      ctaBtn.href = "#";
+      ctaBtn.textContent = "Copy Link & Open Chrome";
+      ctaBtn.onclick = (e) => {
+        e.preventDefault();
+        navigator.clipboard?.writeText(currentUrl);
+        ctaBtn.textContent = "✓ Link copied — paste it in Chrome";
+        setTimeout(() => { ctaBtn.textContent = "Copy Link & Open Chrome"; }, 2500);
+      };
+      downloadBtn.href = "https://www.google.com/chrome/";
     }
-  });
+  }
 
-  // Optional: auto-trigger on load (uncomment to skip modal and launch immediately)
-  // setTimeout(() => btn.click(), 300);
-})();
+  // ---- Main ----
+  const browser = detectBrowser();
+  document.getElementById("detectedBrowser").textContent =
+    `We detected you're using: ${browser.name}`;
+
+  if (!browser.isChrome) {
+    buildCTA();
+    document.getElementById("modal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
 </script>
+
 </body>
 </html>
